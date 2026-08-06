@@ -1,1 +1,4 @@
-2025-08-05 — Flutter SDK installed via VS Code extension, Android Studio installed and configured with cmdline-tools, Android licenses accepted, flutter doctor passing on everything but Visual Studio (irrelevant, Windows desktop only). Tomorrow's first task: create the angelus-companion-flutter repo on GitHub, then generate the Flutter project and run Hello World on the emulator.
+# Angelus Companion — Build Log
+
+## 2025-08-05
+Flutter SDK installed via VS Code extension, Android Studio installed and configured with cmdline-tools, Android licenses accepted, flutter doctor passing on everything but Visual Studio (irrelevant, Windows desktop only). Tomorrow's first task: create the angelus-companion-flutter repo on GitHub, then generate the Flutter project and run Hello World on the emulator.
