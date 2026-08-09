@@ -1,5 +1,24 @@
 # Angelus Companion — Build Log
 
+## 2026-08-08
+Built the prayer and settings screens. The Angelus text lives as a const list
+of PrayerStep records in lib/models/prayer_step.dart so that Week 2 attaches
+timing and audio to a structure rather than editing layout. Prayer screen is
+eight stations with tap and swipe advance, a cross-fade between steps, a thin
+segmented progress rule in gold, versicle in ivory and response in gold, and a
+completion state. Settings sketches bells, sound, prayer, and about sections
+with local state only. Added lib/app/fade_route.dart because Material's default
+slide transition reads as a productivity app and a slow cross-fade does not.
+Both screens are on disk but not yet reachable. The navigation wiring in
+home_screen.dart is incomplete, so BEGIN still does nothing. Stopped here rather
+than debugging tired.
+Tomorrow, first task: wire home_screen.dart to the two new screens, adding the
+three imports, the onPressed on BEGIN, and the settings entry, then hot restart
+with R rather than r because new imports do not survive a hot reload. Then
+Phase 0 close, comparing both screens against the web version for color,
+spacing, and countdown rounding, cleaning the duplicated system path out of the
+User PATH variable, and planning Week 1.
+
 ## 2026-08-07
 Walked the generated project structure, covering what lib actually holds, why android and ios are real host projects rather than scaffolding, what pubspec.yaml governs, and the fact that everything visible is a widget with no markup layer beneath it. Replaced the counter scaffold with the first real Angelus Companion screen. Added google_fonts, created lib/theme/app_theme.dart holding the night, ivory, muted, and gold palette with a Cormorant Garamond text theme, and built lib/screens/home_screen.dart with next bell logic for the six, noon, and six hours, a slowly breathing halo standing in for the bell artwork, and a BEGIN control with no behavior yet. Rewrote main.dart and the default widget test, which was still asserting on the counter. flutter analyze clean and the screen renders correctly on the emulator, with the serif loading and the countdown live.
 Also sorted out repository housekeeping. The repo had been left private and is now public, which is what the build-in-public plan assumed all along. Confirmed BUILD_LOG.md is committed at the root of main.
