@@ -1,5 +1,18 @@
 # Angelus Companion — Build Log
 
+## 2026-08-09
+Wired home_screen.dart to the prayer and settings screens, adding imports for
+fade_route, prayer_screen, and settings_screen and replacing the two empty
+callbacks with pushes through fadeRoute. Both screens are now reachable, the
+cross-fade reads correctly, all eight stations run through to the completion
+state, and the settings switches toggle. Phase 0's screen work is closed.
+Hit a DevFS failure on the first run of the day, immediately after Impeller
+initialized, with nothing listening on the pinned ports. Cause was stale adb
+forwards left behind by the previous session, which survive in the adb server
+after Flutter exits. Fix is adb kill-server then start-server. This is now the
+first thing to try when DevFS fails on a pinned-port setup, ahead of checking
+for port collisions.
+
 ## 2026-08-08
 Built the prayer and settings screens. The Angelus text lives as a const list
 of PrayerStep records in lib/models/prayer_step.dart so that Week 2 attaches

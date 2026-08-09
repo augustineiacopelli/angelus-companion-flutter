@@ -2,7 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../app/fade_route.dart';
 import '../theme/app_theme.dart';
+import 'prayer_screen.dart';
+import 'settings_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -115,10 +118,16 @@ class _HomeScreenState extends State<HomeScreen>
                 textAlign: TextAlign.center,
               ),
               const Spacer(flex: 3),
-              _BeginButton(onPressed: () {}),
+              _BeginButton(
+                onPressed: () => Navigator.of(context).push(
+                  fadeRoute(const PrayerScreen()),
+                ),
+              ),
               const Spacer(flex: 1),
               TextButton(
-                onPressed: () {},
+                onPressed: () => Navigator.of(context).push(
+                  fadeRoute(const SettingsScreen()),
+                ),
                 child: Text('Settings', style: text.bodyMedium),
               ),
               const Spacer(flex: 1),
