@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../app/fade_route.dart';
 import '../theme/app_theme.dart';
+import 'about_screen.dart';
+import 'privacy_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -77,8 +80,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const SizedBox(height: 40),
             const _SectionHeader('ABOUT'),
-            const _NavRow(title: 'About Angelus Companion'),
-            const _NavRow(title: 'Privacy'),
+            _NavRow(
+              title: 'About Angelus Companion',
+              onTap: () => Navigator.of(context).push(
+                fadeRoute<void>(const AboutScreen()),
+              ),
+            ),
+            _NavRow(
+              title: 'Privacy',
+              onTap: () => Navigator.of(context).push(
+                fadeRoute<void>(const PrivacyScreen()),
+              ),
+            ),
             const _NavRow(title: 'Version', detail: '1.0.0'),
           ],
         ),
@@ -162,34 +175,41 @@ class _SwitchRow extends StatelessWidget {
 }
 
 class _NavRow extends StatelessWidget {
-  const _NavRow({required this.title, this.detail});
+  const _NavRow({required this.title, this.detail, this.onTap});
 
   final String title;
   final String? detail;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final TextTheme text = Theme.of(context).textTheme;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      child: Row(
-        children: <Widget>[
-          Expanded(
-            child: Text(
-              title,
-              style: text.bodyMedium?.copyWith(color: AngelusColors.ivory),
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        child: Row(
+          children: <Widget>[
+            Expanded(
+              child: Text(
+                title,
+                style: text.bodyMedium?.copyWith(color: AngelusColors.ivory),
+              ),
             ),
-          ),
-          if (detail != null)
-            Text(detail!, style: text.bodySmall?.copyWith(fontSize: 14)),
-          const SizedBox(width: 12),
-          Icon(
-            Icons.chevron_right,
-            size: 18,
-            color: AngelusColors.muted.withValues(alpha: 0.6),
-          ),
-        ],
+            if (detail != null)
+              Text(detail!, style: text.bodySmall?.copyWith(fontSize: 14)),
+            if (onTap != null) ...<Widget>[
+              const SizedBox(width: 12),
+              Icon(
+                Icons.chevron_right,
+                size: 18,
+                color: AngelusColors.muted.withValues(alpha: 0.6),
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }
