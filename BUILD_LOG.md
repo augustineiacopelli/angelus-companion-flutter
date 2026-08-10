@@ -1,5 +1,47 @@
 # Angelus Companion — Build Log
 
+## 2026-08-10
+Week 1 Day 1. Closed the informational screens and made the settings
+navigation real. Added lib/widgets/quiet_page.dart holding QuietPage plus the
+Prose, Coda, and PageLabel primitives, since About and Privacy share one shape
+and reading text needs different treatment from prayer text. Reading prose is
+ivory rather than the muted bodyMedium default, because muted at 17px sits near
+4.5:1 against night, which is fine for a two-line versicle and tiring across
+four paragraphs. Built about_screen.dart and privacy_screen.dart on top of it.
+Rewrote _NavRow in settings_screen.dart to take an optional onTap, wrapped the
+row in an opaque GestureDetector so the whole row is the target, and made the
+chevron conditional on onTap so the Version row stops implying it navigates.
+About and Privacy are now reachable through fadeRoute. flutter analyze clean,
+navigation verified on the emulator.
+Deliberate copy decision: About describes only what the app already does. No
+mention of the Regina Caeli replacing the Angelus during Eastertide, which
+belongs in future.md rather than on a screen a beta tester will read.
+Privacy copy is written now rather than in Week 7 because every sentence in it
+is a constraint on the persistence and notification work in Weeks 3 and 4.
+Created future.md, which the plan assumed existed and the repo did not have.
+Correction to the 2026-08-09 entry. The pinned-port fix is more fragile than
+recorded. Today's DevFS failure looked identical to Saturday's but had a
+different cause: adb forward --list was empty and nothing was LISTENING on
+8181, but two TIME_WAIT sockets on 8181 remained from Sunday's session.
+Windows holds TIME_WAIT for up to four minutes and refuses a rebind during it,
+and Flutter does not fail loudly when it cannot bind the requested port. It
+falls back to an ephemeral port silently. The orphaned DDS process showed
+--vm-service-uri=http://127.0.0.1:61641/ with --bind-port=0, meaning neither
+pinned port took effect and the connection landed in exactly the high range
+this machine blocks. Fix was killing the orphaned dart.exe DDS and flutter_tools
+processes, leaving the language server, tooling daemon, and DevTools alone,
+then relaunching on 8183 and 8184. New rule: after a run dies, check
+netstat -ano | Select-String "8181" before relaunching. If anything comes back
+at all, including TIME_WAIT, launch on 8183/8184 rather than letting Flutter
+fall back without saying so.
+Two dependencies logged. A physical Android device is a Week 4 prerequisite,
+not a Week 6 one, since Doze, exact alarm permissions, and manufacturer battery
+optimization do not reproduce on the emulator; ordering this week. And Play
+requires a publicly reachable privacy policy URL, which the in-app screen does
+not satisfy; GitHub Pages on the existing public repo is the Week 7 answer.
+Tomorrow, first task: build the bell picker and text size picker, the last two
+dead _NavRow entries in settings, so nothing in the app taps to nothing.
+
 ## 2026-08-09
 Wired home_screen.dart to the prayer and settings screens, adding imports for
 fade_route, prayer_screen, and settings_screen and replacing the two empty
