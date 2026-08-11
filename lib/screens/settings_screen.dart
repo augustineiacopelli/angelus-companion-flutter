@@ -5,6 +5,10 @@ import '../theme/app_theme.dart';
 import 'about_screen.dart';
 import 'privacy_screen.dart';
 
+import '../models/settings_options.dart';
+import 'bell_screen.dart';
+import 'text_size_screen.dart';
+
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
@@ -18,6 +22,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _evening = true;
   bool _vibrate = false;
   bool _keepAwake = true;
+
+  BellVoice _bell = BellVoice.solesmes;
+  PrayerTextSize _textSize = PrayerTextSize.medium;
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +71,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const SizedBox(height: 40),
             const _SectionHeader('SOUND'),
-            const _NavRow(title: 'Bell', detail: 'Solesmes'),
+            _NavRow(
+              title: 'Bell',
+              detail: _bell.label,
+              onTap: () => Navigator.of(context).push(
+                fadeRoute<void>(
+                  BellScreen(
+                    selected: _bell,
+                    onSelected: (BellVoice value) =>
+                        setState(() => _bell = value),
+                  ),
+                ),
+              ),
+            ),
             _SwitchRow(
               title: 'Vibrate',
               value: _vibrate,
@@ -72,7 +91,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const SizedBox(height: 40),
             const _SectionHeader('PRAYER'),
-            const _NavRow(title: 'Text size', detail: 'Medium'),
+            _NavRow(
+              title: 'Text size',
+              detail: _textSize.label,
+              onTap: () => Navigator.of(context).push(
+                fadeRoute<void>(
+                  TextSizeScreen(
+                    selected: _textSize,
+                    onSelected: (PrayerTextSize value) =>
+                        setState(() => _textSize = value),
+                  ),
+                ),
+              ),
+            ),
             _SwitchRow(
               title: 'Keep screen awake',
               value: _keepAwake,

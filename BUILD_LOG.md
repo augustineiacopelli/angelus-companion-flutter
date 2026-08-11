@@ -1,5 +1,55 @@
 # Angelus Companion — Build Log
 
+## 2026-08-11
+Week 1 Day 2. Built the two remaining dead settings rows, so nothing in the
+app taps to nothing. Added lib/models/settings_options.dart holding BellVoice
+and PrayerTextSize as enhanced enums, each constant carrying its own display
+copy and, for text size, its scale multiplier, so the values travel with the
+type rather than living in a switch elsewhere. Added lib/widgets/choice_page.dart
+with ChoicePage and ChoiceOption, built on QuietPage the way About and Privacy
+are, since bell and text size are the same shape and theme selection in Week 3
+will be a third. Selection is marked with a gold check that cross-fades between
+rows rather than a Material radio, which would be louder than anything else on
+screen, and each row carries Semantics with selected set for TalkBack.
+Built bell_screen.dart with four voices and text_size_screen.dart with four
+sizes and a live preview.
+Architecture decision worth keeping. The picker holds its own selection and
+reports every change upward immediately rather than returning a value through
+Navigator.pop. A pushed route does not rebuild when the screen that pushed it
+calls setState, so passing the value down would have frozen the checkmark. More
+importantly, popping with a result covers only the back arrow and returns null
+for the hardware button and the edge gesture, which have no web equivalent and
+no obvious failure mode. Reporting upward makes all three paths identical.
+The preview pulls its text from angelus.first and multiplies the font sizes the
+theme already declares rather than literals, so Week 2 writes the same
+expression on the prayer screen and a later type change moves both. It sits at
+the bottom because it grows at Largest and anything below the options would
+shift under a finger mid-choice.
+Two things deliberately not done. The bell picker has no audition control until
+audio lands in Week 2; a play button that plays nothing is worse than none. And
+the chosen text size does not yet reach the prayer screen, because settings
+owns this state locally and prayer is pushed from home, so applying it means an
+app-level holder. That holder is exactly what Week 3 builds when these values
+start persisting, and building it twice is the wrong trade.
+Correction to the port theory carried since 2026-08-07. Endpoint security on
+this machine does not block ephemeral high ports. Today the VM service came up
+on 52346 and connected cleanly under --no-dds. Every failure this week has been
+DDS. netstat on 8181 was clean before launch and adb forward --list was empty
+both before and during the failure, so there was no collision and no stale
+forward; there was simply no bridge. Pinned ports did take effect this run, the
+orphaned process showing --vm-service-uri on 8181 and --bind-port=8182, and DDS
+still failed to reach the app, refusing on 64329. Sunday's --bind-port=0 process
+was a symptom of DDS dying rather than the cause. Running with --no-dds costs
+DevTools only; hot reload, hot restart, and the console all work, which is an
+acceptable trade through Week 5 when animation timing will want DevTools back.
+Back navigation verified by arrow and by the emulator's on-screen back control.
+The edge-swipe gesture was not testable because this emulator image is set to
+three-button navigation, which folds into the physical device work in Week 4
+alongside Doze and exact alarm permissions.
+Tomorrow, first task: the completion screen. Prayer currently ends in an inline
+_Completion inside prayer_screen.dart, and Week 1 calls for it as its own screen
+before animation and polish take the back half of the week.
+
 ## 2026-08-10
 Week 1 Day 1. Closed the informational screens and made the settings
 navigation real. Added lib/widgets/quiet_page.dart holding QuietPage plus the
