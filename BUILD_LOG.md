@@ -49,6 +49,11 @@ alongside Doze and exact alarm permissions.
 Tomorrow, first task: the completion screen. Prayer currently ends in an inline
 _Completion inside prayer_screen.dart, and Week 1 calls for it as its own screen
 before animation and polish take the back half of the week.
+Scope note on the above. The clean high-port connection was observed at the
+office. Sunday's failing session was at home, likely on VPN. DDS failed in both
+places, so that conclusion holds, but whether ephemeral ports are actually open
+is confirmed for the office network only. Test --no-dds at home before treating
+the firewall as ruled out generally.
 
 ## 2026-08-10
 Week 1 Day 1. Closed the informational screens and made the settings
