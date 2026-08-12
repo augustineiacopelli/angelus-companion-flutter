@@ -1,5 +1,27 @@
 # Angelus Companion — Build Log
 
+## 2026-08-12
+Extracted the completion from `prayer_screen.dart` into
+`lib/screens/completion_screen.dart` as a real destination. Removed the
+duplicated Amen, closed the versicle with its response, and replaced the
+joined progress rule with a single gold line. The screen takes an
+`onReturn` callback so the pushing screen owns the navigation stack.
+Initially pushed the completion on top of the prayer so a stray tap during
+the collect could be undone with the back gesture. On the emulator, a
+single back press from the completion cleared both routes and landed on
+home rather than returning to the collect. No code path in
+`prayer_screen.dart`, `fade_route.dart`, or `main.dart` accounts for the
+second pop, and diagnosing further requires a debug connection that was
+unavailable. Switched to `pushReplacement`, so RETURN and the back gesture
+both end on home. The `_finishing` guard stays and no longer clears, which
+is correct now that the prayer route is disposed at the transition.
+The VM service would not attach all session. DDS shut down immediately on
+8181/8182 and again on pinned alternates 8183/8184. Ports were free, no
+orphaned dart processes, adb cleared. Verified the whole day in release
+mode instead, which needs no VM service.
+Tomorrow: animation timing across the flow, starting with the mismatch
+between the 650ms `fadeRoute` and the 700ms `AnimatedSwitcher`.
+
 ## 2026-08-11
 Week 1 Day 2. Built the two remaining dead settings rows, so nothing in the
 app taps to nothing. Added lib/models/settings_options.dart holding BellVoice

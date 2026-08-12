@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../app/fade_route.dart';
 import '../models/prayer_step.dart';
 import '../theme/app_theme.dart';
+import 'completion_screen.dart';
 
 class PrayerScreen extends StatefulWidget {
   const PrayerScreen({super.key});
@@ -12,27 +14,35 @@ class PrayerScreen extends StatefulWidget {
 
 class _PrayerScreenState extends State<PrayerScreen> {
   int _index = 0;
-  bool _complete = false;
+  bool _finishing = false;
 
   void _advance() {
-    if (_complete) return;
-    setState(() {
-      if (_index < angelus.length - 1) {
-        _index++;
-      } else {
-        _complete = true;
-      }
-    });
+    if (_finishing) return;
+    if (_index < angelus.length - 1) {
+      setState(() => _index++);
+    } else {
+      _finish();
+    }
   }
 
   void _retreat() {
-    setState(() {
-      if (_complete) {
-        _complete = false;
-      } else if (_index > 0) {
-        _index--;
-      }
-    });
+    if (_finishing) return;
+    if (_index > 0) {
+      setState(() => _index--);
+    }
+  }
+
+/// Replace the prayer with the completion. The prayer is over; every
+/// backward path from here belongs on home.
+  void _finish() {
+    setState(() => _finishing = true);
+    Navigator.of(context).pushReplacement<void, void>(
+      fadeRoute<void>(
+        CompletionScreen(
+          onReturn: () => Navigator.of(context).pop(),
+        ),
+      ),
+    );
   }
 
   @override
@@ -54,7 +64,6 @@ class _PrayerScreenState extends State<PrayerScreen> {
             children: <Widget>[
               _TopBar(
                 onClose: () => Navigator.of(context).pop(),
-                showProgress: !_complete,
                 index: _index,
               ),
               Expanded(
@@ -62,16 +71,14 @@ class _PrayerScreenState extends State<PrayerScreen> {
                   duration: const Duration(milliseconds: 700),
                   switchInCurve: Curves.easeIn,
                   switchOutCurve: Curves.easeOut,
-                  child: _complete
-                      ? const _Completion(key: ValueKey<String>('complete'))
-                      : _StepView(
-                          key: ValueKey<int>(_index),
-                          step: angelus[_index],
-                        ),
+                  child: _StepView(
+                    key: ValueKey<int>(_index),
+                    step: angelus[_index],
+                  ),
                 ),
               ),
               AnimatedOpacity(
-                opacity: (_index == 0 && !_complete) ? 1 : 0,
+                opacity: _index == 0 ? 1 : 0,
                 duration: const Duration(milliseconds: 800),
                 child: Padding(
                   padding: const EdgeInsets.only(bottom: 40),
@@ -93,14 +100,9 @@ class _PrayerScreenState extends State<PrayerScreen> {
 }
 
 class _TopBar extends StatelessWidget {
-  const _TopBar({
-    required this.onClose,
-    required this.showProgress,
-    required this.index,
-  });
+  const _TopBar({required this.onClose, required this.index});
 
   final VoidCallback onClose;
-  final bool showProgress;
   final int index;
 
   @override
@@ -117,23 +119,19 @@ class _TopBar extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: AnimatedOpacity(
-              opacity: showProgress ? 1 : 0,
-              duration: const Duration(milliseconds: 500),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List<Widget>.generate(angelus.length, (int i) {
-                  return AnimatedContainer(
-                    duration: const Duration(milliseconds: 500),
-                    margin: const EdgeInsets.symmetric(horizontal: 3),
-                    height: 2,
-                    width: 14,
-                    color: i <= index
-                        ? AngelusColors.gold
-                        : AngelusColors.muted.withValues(alpha: 0.25),
-                  );
-                }),
-              ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List<Widget>.generate(angelus.length, (int i) {
+                return AnimatedContainer(
+                  duration: const Duration(milliseconds: 500),
+                  margin: const EdgeInsets.symmetric(horizontal: 3),
+                  height: 2,
+                  width: 14,
+                  color: i <= index
+                      ? AngelusColors.gold
+                      : AngelusColors.muted.withValues(alpha: 0.25),
+                );
+              }),
             ),
           ),
           const SizedBox(width: 36),
@@ -179,38 +177,6 @@ class _StepView extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: text.bodyMedium?.copyWith(color: AngelusColors.ivory),
               ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _Completion extends StatelessWidget {
-  const _Completion({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final TextTheme text = Theme.of(context).textTheme;
-
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 48),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Text('Amen.', style: text.displaySmall),
-            const SizedBox(height: 32),
-            Text(
-              'May the divine assistance remain always with us.',
-              textAlign: TextAlign.center,
-              style: text.bodySmall,
-            ),
-            const SizedBox(height: 72),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('RETURN', style: text.labelLarge),
-            ),
           ],
         ),
       ),
