@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import 'quiet_page.dart';
 
+import '../app/motion.dart';
+
 /// One selectable option on a [ChoicePage].
 class ChoiceOption<T> {
   const ChoiceOption({
@@ -118,7 +120,7 @@ class _ChoiceRow<T> extends StatelessWidget {
               const SizedBox(width: 16),
               AnimatedOpacity(
                 opacity: selected ? 1 : 0,
-                duration: const Duration(milliseconds: 300),
+                duration: Motion.mark,
                 child: const Padding(
                   padding: EdgeInsets.only(top: 4),
                   child: Icon(Icons.check, size: 18, color: AngelusColors.gold),

@@ -1,5 +1,60 @@
 # Angelus Companion — Build Log
 
+
+## 2026-08-13
+Week 1 Day 4. Put every transition in the app on one tempo. Added
+lib/app/motion.dart holding the durations and curves, so tuning the pace of
+the app is one edit in one file rather than a search through five. Nothing
+outside it writes a Duration or names a Curves constant now except the home
+screen's six-second breath, which is an ambient animation rather than a
+transition and does not belong to the tempo.
+The 650 against 700 noted yesterday turned out to be the smaller problem.
+AnimatedSwitcher cross-fades its outgoing and incoming children
+simultaneously, stacked in the same center-aligned box, so every station
+change had roughly 300ms where two prayers were legible on top of each
+other. At full speed it read as a smear rather than a doubling, which is why
+it survived four days. Fixed by anchoring both switchInCurve and
+switchOutCurve to Interval(0.5, 1.0): the outgoing child's controller runs
+backward and empties during the first half of the duration, the incoming
+child's runs forward and fills during the second, so the change is sequenced
+rather than overlapped. Duration stayed at 700. The original number was never
+the problem.
+Because nothing happens to the text for the first half of a sequenced change,
+the progress tick dropped to 300ms so that something acknowledges the tap
+immediately. Route arrival is 600 and departure 450, deliberately not a whole
+number of beats; two makes leaving feel like it needs permission and one
+reads as snapping. The 'tap to continue' hint recedes over 900 and is now
+wrapped in ExcludeSemantics, since TalkBack was reading it aloud on every
+station after the first despite it having faded to nothing.
+Built the completion screen's reveal in three movements rather than having it
+arrive whole: the gold rule draws outward from center, the versicle and
+response settle, then RETURN appears last so the eye is not offered an exit
+before the words have been read. The lead-in covering the route's own fade is
+an Interval inside the controller rather than a Future.delayed, because
+timeDilation stretches tickers and not timers, and a scheduled delay would
+have made the sequence unreadable under slow motion.
+Fixed a real bug found while testing. RETURN on the completion threw
+"This widget has been unmounted, so the State no longer has a context."
+The onReturn callback closed over the prayer screen's context, and
+pushReplacement disposes that route when the transition completes, so the
+State was defunct by the time the button was pressed. Resolving the
+NavigatorState once and holding it fixes it, since the navigator outlives
+both routes. This went unnoticed on Wednesday because the back gesture and
+the system back button pop the route directly and never touch onReturn, and
+those were the two paths verified.
+Tooling. DevTools is where the slow animations toggle lives and --no-dds
+costs DevTools, so timeDilation is now wired into main.dart behind
+int.fromEnvironment('slowmo'), defaulting to 1 and set with
+--dart-define=slowmo=5. Compile-time, so it cannot reach a release build by
+accident, and a reminder that dart-define changes need a full relaunch rather
+than r or R. Tuning any of this at full speed is guesswork; the sequencing
+problem above was invisible until it was stretched five times.
+Emulator came up offline this morning and resolved itself on its own during a
+cold boot. Not adb, not the snapshot. New first question when a device shows
+offline: is the emulator window still booting. Wait before touching anything.
+Tomorrow, first task: Week 1's remaining polish, judging spacing and
+typography against the web version now that the motion is settled.
+
 ## 2026-08-12
 Extracted the completion from `prayer_screen.dart` into
 `lib/screens/completion_screen.dart` as a real destination. Removed the

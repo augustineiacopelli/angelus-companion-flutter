@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../app/fade_route.dart';
+import '../app/motion.dart';
 import '../models/prayer_step.dart';
 import '../theme/app_theme.dart';
 import 'completion_screen.dart';
@@ -32,14 +33,20 @@ class _PrayerScreenState extends State<PrayerScreen> {
     }
   }
 
-/// Replace the prayer with the completion. The prayer is over; every
-/// backward path from here belongs on home.
+  /// Replace the prayer with the completion. The prayer is over; every
+  /// backward path from here belongs on home.
+  ///
+  /// The navigator is resolved once and held, rather than looked up again
+  /// inside the callback. `pushReplacement` disposes this route, so by the
+  /// time RETURN is pressed this State is unmounted and its context is
+  /// defunct; the NavigatorState outlives both routes and is safe to keep.
   void _finish() {
     setState(() => _finishing = true);
-    Navigator.of(context).pushReplacement<void, void>(
+    final NavigatorState navigator = Navigator.of(context);
+    navigator.pushReplacement<void, void>(
       fadeRoute<void>(
         CompletionScreen(
-          onReturn: () => Navigator.of(context).pop(),
+          onReturn: () => navigator.pop(),
         ),
       ),
     );
@@ -47,6 +54,8 @@ class _PrayerScreenState extends State<PrayerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final bool hintVisible = _index == 0;
+
     return Scaffold(
       body: GestureDetector(
         behavior: HitTestBehavior.opaque,
@@ -68,26 +77,30 @@ class _PrayerScreenState extends State<PrayerScreen> {
               ),
               Expanded(
                 child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 700),
-                  switchInCurve: Curves.easeIn,
-                  switchOutCurve: Curves.easeOut,
+                  duration: Motion.passage,
+                  switchInCurve: Motion.arrive,
+                  switchOutCurve: Motion.depart,
                   child: _StepView(
                     key: ValueKey<int>(_index),
                     step: angelus[_index],
                   ),
                 ),
               ),
-              AnimatedOpacity(
-                opacity: _index == 0 ? 1 : 0,
-                duration: const Duration(milliseconds: 800),
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 40),
-                  child: Text(
-                    'tap to continue',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodySmall
-                        ?.copyWith(fontSize: 13),
+              ExcludeSemantics(
+                excluding: !hintVisible,
+                child: AnimatedOpacity(
+                  opacity: hintVisible ? 1 : 0,
+                  duration: Motion.recede,
+                  curve: Motion.both,
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 40),
+                    child: Text(
+                      'tap to continue',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodySmall
+                          ?.copyWith(fontSize: 13),
+                    ),
                   ),
                 ),
               ),
@@ -122,8 +135,13 @@ class _TopBar extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List<Widget>.generate(angelus.length, (int i) {
+                // One beat, and deliberately faster than the passage. With a
+                // sequenced switch nothing happens to the text for the first
+                // half of the change, so the tick is the only immediate
+                // acknowledgement that the tap was heard.
                 return AnimatedContainer(
-                  duration: const Duration(milliseconds: 500),
+                  duration: Motion.mark,
+                  curve: Motion.enter,
                   margin: const EdgeInsets.symmetric(horizontal: 3),
                   height: 2,
                   width: 14,
