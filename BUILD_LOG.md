@@ -1,6 +1,48 @@
 # Angelus Companion — Build Log
 
 
+## 2026-08-20
+Added audio plumbing for the bell picker's audition control, the feature
+the 08-11 entry flagged as deliberately skipped until audio landed. Added
+audioplayers 6.8.1 and lib/app/bell_player.dart, a small wrapper around
+AudioPlayer that maps BellVoice to an asset path and no-ops on Silence
+rather than treating it as an error. Triple doesn't get its own recording;
+one stroke clip is replayed through a 3-3-3-then-9 sequence coded directly
+in BellPlayer, since sourcing three separate takes of an already-rare
+recording is worse than sequencing one. The stroke-gap and group-gap
+durations live in BellPlayer rather than Motion, because they are audio
+cadence rather than a UI transition: nothing about them animates a widget
+property or a screen change, so Motion's tempo-of-the-app doc comment would
+have been the wrong home for them.
+Extended ChoiceOption with an optional onAudition callback, rendered in
+choice_page.dart's _ChoiceRow as a small play glyph ahead of the selection
+checkmark, hit-tested independently of the row's own tap so previewing a
+bell doesn't also select it. BellScreen converted from Stateless to
+Stateful to own the BellPlayer's lifecycle and dispose it.
+No real bell recordings exist yet; confirmed by searching the repo for any
+audio files or an assets folder before starting, and the web app has
+nothing to reuse either. assets/audio/solesmes.wav, village.wav, and
+triple.wav are three silent placeholder WAVs generated with a short Python
+script (wave + struct, no ffmpeg installed on this machine), purely so
+pubspec.yaml had real files to bundle and flutter run wouldn't crash on a
+missing asset. Verified live on the emulator: tapping the play icon on
+Solesmes, Village, and Triple produces no error and no sound, exactly as
+expected for silent placeholders; Silence correctly has no play icon at
+all. Sourcing guidance for the real recordings is written into
+assets/audio/README.md: Pixabay for royalty-free with no attribution
+required, Freesound for more character at the cost of a credit line unless
+the result is tagged CC0.
+Also cleared an orphaned dart.exe process that had been LISTENING on 8182
+since the 08-12 session, another instance of the pattern first logged
+08-10: check netstat before every launch, not just after a failure.
+Noted, not yet fixed: future.md, logged as created 08-10, was never
+actually committed and does not exist anywhere in git history.
+Tomorrow, first task: source three real bell recordings (Freesound or
+Pixabay, see assets/audio/README.md) and drop them in under the existing
+filenames; no code changes needed. After that, the Week 1 spacing and
+typography polish pass against the web version, still outstanding since
+08-13.
+
 ## 2026-08-13
 Week 1 Day 4. Put every transition in the app on one tempo. Added
 lib/app/motion.dart holding the durations and curves, so tuning the pace of

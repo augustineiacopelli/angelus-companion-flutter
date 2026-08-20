@@ -11,11 +11,17 @@ class ChoiceOption<T> {
     required this.value,
     required this.label,
     this.description,
+    this.onAudition,
   });
 
   final T value;
   final String label;
   final String? description;
+
+  /// When set, renders a small play control on the row that previews this
+  /// option without selecting it. Omit for options with nothing to play
+  /// (e.g. a "Silence" choice).
+  final VoidCallback? onAudition;
 }
 
 /// A reading page offering a short list of choices, exactly one of which is
@@ -117,7 +123,24 @@ class _ChoiceRow<T> extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(width: 16),
+              if (option.onAudition != null)
+                Semantics(
+                  button: true,
+                  label: 'Play ${option.label}',
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: option.onAudition,
+                    child: const Padding(
+                      padding: EdgeInsets.all(4),
+                      child: Icon(
+                        Icons.play_arrow_rounded,
+                        size: 20,
+                        color: AngelusColors.muted,
+                      ),
+                    ),
+                  ),
+                ),
+              const SizedBox(width: 12),
               AnimatedOpacity(
                 opacity: selected ? 1 : 0,
                 duration: Motion.mark,
