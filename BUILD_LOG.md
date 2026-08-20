@@ -37,11 +37,31 @@ since the 08-12 session, another instance of the pattern first logged
 08-10: check netstat before every launch, not just after a failure.
 Noted, not yet fixed: future.md, logged as created 08-10, was never
 actually committed and does not exist anywhere in git history.
-Tomorrow, first task: source three real bell recordings (Freesound or
-Pixabay, see assets/audio/README.md) and drop them in under the existing
-filenames; no code changes needed. After that, the Week 1 spacing and
-typography polish pass against the web version, still outstanding since
-08-13.
+Sourced the three real bell recordings. Neither Pixabay nor Freesound
+turned out to be practical to fetch headlessly (both need an API key for
+search, and curl against their web UIs returns JS-rendered pages with no
+direct download links), so used Wikimedia Commons instead, which has an
+unauthenticated search API. Landed on the "Samariter Church Bell I/II/III"
+series — three individual bells of the Samariterkirche, Berlin, each
+recorded as a single struck stroke left to ring out ~20 seconds, CC BY-SA
+4.0 (Wikimedia contributor Pete w.). Bell I (Es, deepest) became
+solesmes.wav, Bell III (b, brightest) became village.wav, Bell II (g,
+middle) became triple.wav, trimmed to one ~1.3s stroke since BellPlayer
+sequences it in code. Source files were Ogg Vorbis, which Python's
+built-in wave module can't decode (PCM-only) and this machine has no
+ffmpeg; `pip install soundfile` pulled a Windows wheel with libsndfile
+statically bundled, which decodes Ogg Vorbis directly with no ffmpeg
+dependency, and also wrote the trimmed output as standard PCM16 WAV.
+Verified live on the emulator: all three play in bell_screen without
+throwing, and Triple audibly triggers 21 separate MediaPlayer instances
+in logcat (3+3+3+9), matching the intended pattern; Silence still shows
+no play icon. CC BY-SA requires attribution, which went into the About
+screen under a new "THE BELL RECORDINGS" section rather than only in
+assets/audio/README.md, since that's what a user actually sees; the
+README explains the swap if any of the three are replaced with something
+CC0 later, which would let that credit come back out.
+Tomorrow, first task: Week 1's remaining spacing and typography polish
+pass against the web version, still outstanding since 08-13.
 
 ## 2026-08-13
 Week 1 Day 4. Put every transition in the app on one tempo. Added

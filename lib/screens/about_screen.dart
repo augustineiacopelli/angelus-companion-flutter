@@ -31,6 +31,12 @@ class AboutScreen extends StatelessWidget {
           'Nothing here asks you to make an account, and nothing is required '
           'of you but the minute.',
         ),
+        PageLabel('THE BELL RECORDINGS'),
+        Prose(
+          'The bell sounds are excerpts of the Samariterkirche bells in '
+          'Berlin, recorded by Wikimedia Commons contributor Pete w. and '
+          'shared under a Creative Commons Attribution-ShareAlike license.',
+        ),
         PageLabel('THIS APP'),
         Prose(
           'Angelus Companion is made by Augustine Iacopelli. It is one '
